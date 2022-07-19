@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 char	*ft_rewrite_line(char *line)
 {
@@ -50,15 +50,14 @@ char	*ft_enter_line(char *line)
 		return (NULL);
 	while (line[i] != '\0' && line[i] != '\n')
 		i++;
-	res = malloc(sizeof(char) * (i + 1));
+	res = malloc(sizeof(char) * (i + 2));
 	if (!res)
 		return (NULL);
 	res[++i] = '\0';
-	i--;
-	while (i != -1)
+	while (i != 0)
 	{
-		res[i] = line[i];
 		i--;
+		res[i] = line[i];
 	}
 	return (res);
 }
@@ -78,7 +77,7 @@ char	*ft_strdup_line(char *line)
 
 int	ft_check_correct(int fd, char *buff)
 {
-	if (fd < 0 || BUFF_SIZE <= 0 || !buff)
+	if (fd < 0 || BUFFER_SIZE <= 0 || !buff)
 	{
 		free (buff);
 		return (1);
@@ -88,28 +87,28 @@ int	ft_check_correct(int fd, char *buff)
 
 char	*get_next_line(int fd)
 {
-	static char	*line[OPEN_MAX];
+	static char	*line;
 	char		*buff;
 	char		*res;
 	int			check_read;
 
-	line[fd] = ft_strdup_line(line[fd]);
-	buff = malloc(sizeof(char) * (BUFF_SIZE + 1));
+	line = ft_strdup_line(line);
+	buff = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (ft_check_correct(fd, buff))
 		return (NULL);
-	check_read = read(fd, buff, BUFF_SIZE);
+	check_read = read(fd, buff, BUFFER_SIZE);
 	while (check_read > 0)
 	{
 		buff[check_read] = '\0';
-		line[fd] = ft_strjoin(line[fd], buff);
-		if (ft_check_line_feed(line[fd]))
+		line = ft_strjoin(line, buff);
+		if (ft_check_line_feed(line))
 			break ;
-		check_read = read(fd, buff, BUFF_SIZE);
+		check_read = read(fd, buff, BUFFER_SIZE);
 	}
 	free(buff);
-	res = ft_enter_line(line[fd]);
-	line[fd] = ft_rewrite_line(line[fd]);
-	if (res == NULL && check_read <= 0 && line[fd] == NULL)
+	res = ft_enter_line(line);
+	line = ft_rewrite_line(line);
+	if (res == NULL && check_read <= 0 && line == NULL)
 		return (NULL);
 	return (res);
 }
